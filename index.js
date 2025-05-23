@@ -59,8 +59,9 @@ app.post('/chat', async (req, res) => {
       reply = `Please consult your doctor before taking ${medicine} during pregnancy.`;
     } else if (intent === 'ask_activity_safety' && activity) {
       reply = `Engaging in ${activity} may not be recommended during pregnancy. Please check with a healthcare provider.`;
+    } else if (intent === 'ask_pregnancy_avoid') {
+      reply = `During Pregnancy Period Taking ${medicine} affect the Baby.`;
     }
-
     res.json({ reply });
   } catch (error) {
     console.error(error.response?.data || error.message);
