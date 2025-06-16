@@ -1,17 +1,15 @@
-require('dotenv').config({ path: './Chatbotapi.env' });
+require('dotenv').config({ path: './Chatbotapi.env' }); // Only used locally
+
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Wit.ai token from environment
 const WIT_AI_TOKEN = process.env.WIT_AI_TOKEN;
 
-// API route for chatbot
 app.post('/chat', async (req, res) => {
   const { message } = req.body;
 
@@ -55,33 +53,30 @@ app.post('/chat', async (req, res) => {
       } else {
         reply = 'You should focus on fresh fruits, vegetables, lean proteins, and whole grains.';
       }
-    } else if (intent === 'ask_food_safety') {
+    } else if (intent === 'ask_food_safety' && food) {
       reply = `${food} should be consumed with caution during pregnancy. It's best to avoid undercooked or unpasteurized options.`;
     } else if (intent === 'ask_medicine_safety' && medicine) {
       reply = `Please consult your doctor before taking ${medicine} during pregnancy.`;
     } else if (intent === 'ask_activity_safety' && activity) {
       reply = `Engaging in ${activity} may not be recommended during pregnancy. Please check with a healthcare provider.`;
     } else if (intent === 'ask_pregnancy_avoid' && medicine) {
-      reply = `During Pregnancy Period, taking ${medicine} may affect the baby.`;
+      reply = `During Pregnancy Period Taking ${medicine} may affect the baby.`;
     }
 
     res.json({ reply });
+
   } catch (error) {
     console.error(error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to connect to Wit.ai' });
   }
 });
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, 'build')));
-
-// Fallback to index.html for any unmatched routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// ✅ Root route to fix "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send('🤖 Pregnancy Chatbot API is live!');
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🤖 Pregnancy Chatbot API is live on port ${PORT}!`);
+  console.log(`✅ Chatbot backend running on port ${PORT}`);
 });
