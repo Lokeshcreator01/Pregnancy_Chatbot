@@ -8,9 +8,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Wit.ai token from environment
 const WIT_AI_TOKEN = process.env.WIT_AI_TOKEN;
 
-// Chat endpoint
+// API route for chatbot
 app.post('/chat', async (req, res) => {
   const { message } = req.body;
 
@@ -60,8 +61,8 @@ app.post('/chat', async (req, res) => {
       reply = `Please consult your doctor before taking ${medicine} during pregnancy.`;
     } else if (intent === 'ask_activity_safety' && activity) {
       reply = `Engaging in ${activity} may not be recommended during pregnancy. Please check with a healthcare provider.`;
-    } else if (intent === 'ask_pregnancy_avoid') {
-      reply = `During Pregnancy Period Taking ${medicine} affects the baby.`;
+    } else if (intent === 'ask_pregnancy_avoid' && medicine) {
+      reply = `During Pregnancy Period, taking ${medicine} may affect the baby.`;
     }
 
     res.json({ reply });
@@ -71,10 +72,10 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-// Serve static React build files
+// Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Fallback to index.html for SPA routes
+// Fallback to index.html for any unmatched routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
@@ -82,5 +83,5 @@ app.get('*', (req, res) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Chatbot backend running on port ${PORT}`);
+  console.log(`🤖 Pregnancy Chatbot API is live on port ${PORT}!`);
 });
