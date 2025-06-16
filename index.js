@@ -1,4 +1,5 @@
-require('dotenv').config({ path: './Chatbotapi.env' });
+require('dotenv').config({ path: './Chatbotapi.env' }); // Only used locally
+
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
@@ -26,7 +27,6 @@ app.post('/chat', async (req, res) => {
     const entities = witResponse.data.entities;
     const intent = witResponse.data.intents?.[0]?.name || 'unknown';
 
-    // Extract specific entities
     const symptom = entities['symptom:symptom']?.[0]?.value;
     const stage =
       entities['pregnancy_stage:pregnancy_stage']?.[0]?.value ||
@@ -53,20 +53,27 @@ app.post('/chat', async (req, res) => {
       } else {
         reply = 'You should focus on fresh fruits, vegetables, lean proteins, and whole grains.';
       }
-    } else if (intent === 'ask_food_safety') {
+    } else if (intent === 'ask_food_safety' && food) {
       reply = `${food} should be consumed with caution during pregnancy. It's best to avoid undercooked or unpasteurized options.`;
     } else if (intent === 'ask_medicine_safety' && medicine) {
       reply = `Please consult your doctor before taking ${medicine} during pregnancy.`;
     } else if (intent === 'ask_activity_safety' && activity) {
       reply = `Engaging in ${activity} may not be recommended during pregnancy. Please check with a healthcare provider.`;
-    } else if (intent === 'ask_pregnancy_avoid') {
-      reply = `During Pregnancy Period Taking ${medicine} affect the Baby.`;
+    } else if (intent === 'ask_pregnancy_avoid' && medicine) {
+      reply = `During Pregnancy Period Taking ${medicine} may affect the baby.`;
     }
+
     res.json({ reply });
+
   } catch (error) {
     console.error(error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to connect to Wit.ai' });
   }
+});
+
+// ✅ Root route to fix "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send('🤖 Pregnancy Chatbot API is live!');
 });
 
 const PORT = process.env.PORT || 5000;
